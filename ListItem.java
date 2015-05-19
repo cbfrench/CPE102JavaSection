@@ -3,10 +3,10 @@
  */
 public class ListItem
 {
-    protected int ord;
+    protected long ord;
     protected Object item;
 
-    public ListItem(Object item, int ord)
+    public ListItem(Object item, long ord)
     {
         this.ord = ord;
         this.item = item;

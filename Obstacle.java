@@ -1,12 +1,17 @@
+import processing.core.PImage;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Chanye on 4/28/2015.
  */
 public class Obstacle
     extends Position
 {
-    public Obstacle(String name, Point position)
+    public Obstacle(String name, Point position, ArrayList<PImage> imgs)
     {
-        super(name, position);
+        super(name, position, imgs);
     }
 
     public String entity_string()

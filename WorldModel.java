@@ -1,39 +1,83 @@
 import javafx.geometry.Pos;
+import processing.core.PImage;
 
 import javax.swing.text.html.parser.Entity;
-import java.util.ArrayList;
+import java.awt.font.NumericShaper;
+import java.lang.reflect.Array;
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * Created by Chanye on 4/29/2015.
  */
-public class WorldModel {
-    private int num_rows;
-    private int num_cols;
-    private Grid occupancy;
-    private Grid background;
+public class WorldModel
+    extends Image_store
+{
+    protected int num_rows;
+    protected int num_cols;
+    private Position[][] occupancy;
+    private Background[][] background;
     private ArrayList<Position> entities;
     private OrderedList action_queue;
+    private Random random;
 
-    public WorldModel(int num_rows, int num_cols, Position background) {
-        this.background = new Grid(num_cols, num_rows, background);
+    public WorldModel(int num_rows, int num_cols, Background background) {
+        this.background = new Background[num_rows][num_cols];
         this.num_rows = num_rows;
         this.num_cols = num_cols;
-        this.occupancy = new Grid(num_cols, num_rows, null);
-        this.entities = new ArrayList<Position>();
+        this.occupancy = new Position[num_rows][num_cols];
+        this.entities = new ArrayList<>();
         this.action_queue = new OrderedList();
+    }
+
+    public int getNumRows()
+    {
+        return this.num_rows;
+    }
+
+    public int getNumCols()
+    {
+        return this.num_cols;
     }
 
     public boolean within_bounds(Point pt) {
         return (pt.x >= 0 && pt.x < num_cols && pt.y >= 0 && pt.y < num_rows);
     }
 
+    public Position[][] get_occupancy()
+    {
+        return this.occupancy;
+    }
+
+    public Position get_tile_occupant(Point pt)
+    {
+        if (within_bounds(pt))
+        {
+            return occupancy[pt.getY()][pt.getX()];
+        }
+        return null;
+    }
+
+    public void set_tile_occupant(Point pt, Position entity)
+    {
+        if (within_bounds(pt))
+        {
+            occupancy[pt.getY()][pt.getX()] = entity;
+        }
+    }
+
     public boolean is_occupied(Point pt)
     {
-        return (within_bounds(pt) && occupancy.get_cell(pt) != null);
+        return (within_bounds(pt) && get_tile_occupant(pt) != null);
     }
 
     public int distance_sq(Point p1, Point p2) {
         return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
+    }
+
+    public void schedule_action(Object action, long time)
+    {
+        action_queue.insert(action, time);
     }
 
     public Position nearest_entity(ArrayList<Position> entity_dists, ArrayList<Integer> dist) {
@@ -65,29 +109,9 @@ public class WorldModel {
         return nearest_entity(oftype, distance);
     }
 
-    public void add_entity(Position entity) {
-        Point pt = entity.get_position();
-        if (within_bounds(pt)) {
-            Position old_entity = occupancy.get_cell(pt);
-            if (old_entity != null) {
-                old_entity.clear_pending_actions();
-            }
-            occupancy.set_cell(pt, entity);
-            entities.add(entity);
-        }
-    }
-
-    public ArrayList<Point> move_entity(Position entity, Point pt) {
-        ArrayList<Point> tiles = new ArrayList<Point>();
-        if (within_bounds(pt)) {
-            Point old_pt = entity.get_position();
-            occupancy.set_cell(old_pt, null);
-            tiles.add(old_pt);
-            occupancy.set_cell(pt, entity);
-            tiles.add(pt);
-            entity.set_position(pt);
-        }
-        return tiles;
+    public void add_entity(Position entity)
+    {
+        entities.add(entity);
     }
 
     public void remove_entity(Position entity) {
@@ -95,20 +119,20 @@ public class WorldModel {
     }
 
     public void remove_entity_at(Point pt) {
-        if (within_bounds(pt) && occupancy.get_cell(pt) != null) {
-            Position entity = occupancy.get_cell(pt);
-            Point point = new Point(-1, -1);
-            entity.set_position(point);
-            entities.remove(entity);
-            occupancy.set_cell(pt, null);
+        if(is_occupied(pt))
+        {
+            Position entity = get_tile_occupant(pt);
+            entity.set_position(new Point(-1, -1));
+            get_entities().remove(entity);
+            set_tile_occupant(pt, null);
         }
     }
 
-    public Position get_background(Point pt)
+    public Background get_background(Point pt)
     {
         if (within_bounds(pt))
         {
-            return background.get_cell(pt);
+            return background[pt.getY()][pt.getX()];
         }
         else
         {
@@ -116,28 +140,99 @@ public class WorldModel {
         }
     }
 
-    public void set_background(Point pt, Position bgnd)
+    public void set_background(Point pt, Background bgnd)
     {
         if (within_bounds(pt))
         {
-            background.set_cell(pt, bgnd);
-        }
-    }
-
-    public Position get_tile_occupant(Point pt)
-    {
-        if (within_bounds(pt))
-        {
-            return occupancy.get_cell(pt);
-        }
-        else
-        {
-            return null;
+            background[pt.getY()][pt.getX()] = bgnd;
         }
     }
 
     public ArrayList<Position> get_entities()
     {
         return entities;
+    }
+
+    public void unschedule_action(Object action)
+    {
+        action_queue.remove(action);
+    }
+    /*
+    public ArrayList<Integer> update_on_time(int ticks)
+    {
+        ArrayList<Integer> tiles = new ArrayList<Integer>();
+
+        ArrayList<ListItem> next = action_queue.head();
+        while (next && next.ord < 1)
+    }
+    */
+
+    public PImage get_background_image(Point pt)
+    {
+        Position background = get_background(pt);
+        if (background != null)
+        {
+            return background.get_image();
+        }
+        else
+        {
+            return null;
+        }
+    }
+    /*
+    public Quake create_quake(Point pt, int ticks, HashMap<String, List<PImage>> i_store)
+    {
+        Quake quake = new Quake("quake", pt, Actions.QUAKE_ANIMATION_RATE, new Image_store().get_images("quake"));
+        quake.schedule_quake(this, ticks);
+        return quake;
+    }
+
+    public OreBlob create_blob(String name, Point pt, int rate, int ticks, HashMap<String, List<PImage>> i_store)
+    {
+        OreBlob blob = new OreBlob(name, pt, (random.nextInt(Actions.BLOB_ANIMATION_MAX - Actions.BLOB_ANIMATION_MIN + 1) + Actions.BLOB_ANIMATION_MIN)
+                                              * Actions.BLOB_ANIMATION_RATE_SCALE, Image_store.get_images(i_store, "blob"), rate);
+        blob.schedule_blob(this, ticks, i_store);
+        return blob;
+    }
+    */
+
+    public Vein create_vein(String name, Point pt, int ticks, HashMap<String, List<PImage>> i_store)
+    {
+        Vein vein = new Vein("vein" + name, new Image_store().get_images("vein"), pt, (random.nextInt(Actions.VEIN_RATE_MAX - Actions.VEIN_RATE_MIN + 1)
+                + Actions.VEIN_RATE_MIN));
+        return vein;
+    }
+    /*
+    public Ore create_ore(String name, Point pt, int ticks, HashMap<String, List<PImage>> i_store)
+    {
+        Ore ore = new Ore(name, Image_store.get_images(i_store, "blob"), pt, (random.nextInt(Actions.ORE_CORRUPT_MAX - Actions.ORE_CORRUPT_MIN + 1)));
+        ore.schedule_ore(this, ticks, i_store);
+        return ore;
+    }
+    */
+    public Point find_open_around(Point pt, int distance)
+    {
+        for (int dy = -distance ; dy <= distance + 1; dy ++)
+        {
+            for (int dx = -distance ; dx <= distance +1; dx ++ )
+            {
+                Point new_pt = new Point(pt.getX() + dx, pt.getY() + dy);
+
+                if (within_bounds(new_pt) && !(is_occupied(pt)))
+                {
+                    return new_pt;
+                }
+            }
+        }
+        return null;
+    }
+
+    public void clear_pending_actions_world(Position entity)
+    {
+        for (Object action : entity.get_pending_actions())
+        {
+            unschedule_action(action);
+        }
+        entity.clear_pending_actions();
     }
 }

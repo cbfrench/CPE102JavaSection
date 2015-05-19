@@ -1,4 +1,7 @@
+import processing.core.PImage;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Chanye on 4/28/2015.
@@ -7,11 +10,11 @@ public class Not_animated
     extends Position
 {
     private int rate;
-    private int imgs;
+    private List<PImage> imgs;
 
-    public Not_animated(String name, int imgs, Point position, int rate)
+    public Not_animated(String name, ArrayList<PImage> imgs, Point position, int rate)
     {
-        super(name, position);
+        super(name, position, imgs);
         this.rate = rate;
         this.imgs = imgs;
     }

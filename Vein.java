@@ -1,3 +1,8 @@
+import processing.core.PImage;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Chanye on 4/28/2015.
  */
@@ -6,7 +11,7 @@ public class Vein
 {
     private int resource_distance;
 
-    public Vein(String name, int imgs, Point position, int rate, int resource_distance)
+    public Vein(String name, ArrayList<PImage> imgs, Point position, int rate)
     {
         super(name, imgs, position, rate);
         this.resource_distance = 1;

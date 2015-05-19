@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class TestCases
+/*public class TestCases
 {
    private static final double DELTA = 0.00001;
 
@@ -142,3 +142,4 @@ public class TestCases
       assertEquals (world.distance_sq (pt2, pt), 5, DELTA);
    }
 }
+*/

@@ -3,7 +3,8 @@ import java.util.ArrayList;
 /**
  * Created by Chanye on 5/3/2015.
  */
-public class OrderedList
+public class
+        OrderedList
 {
     private ArrayList<ListItem> list;
 
@@ -12,7 +13,7 @@ public class OrderedList
         this.list = new ArrayList<ListItem>();
     }
 
-    public void insert(Object item, int ord)
+    public void insert(Object item, long ord)
     {
         int size = list.size();
         int idx = 0;

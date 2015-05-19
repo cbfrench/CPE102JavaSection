@@ -1,3 +1,8 @@
+import processing.core.PImage;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Chanye on 4/28/2015.
  */
@@ -7,10 +12,11 @@ public class Blacksmith
     private int resource_limit;
     private int rate;
     private int resource_distance;
+    private ArrayList<Integer> imgs;
 
-    public Blacksmith(String name, Point position, int resource_limit, int rate, int resource_distance)
+    public Blacksmith(String name, Point position, ArrayList<PImage> imgs, int resource_limit, int rate, int resource_distance)
     {
-        super(name, position);
+        super(name, position, imgs);
         this.resource_distance = 1;
     }
 
