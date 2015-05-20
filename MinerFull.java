@@ -12,7 +12,7 @@ public class MinerFull
     extends Miner
 {
     public MinerFull(String name, Point position, int animation_rate,
-                     ArrayList<PImage> imgs, int rate, int resource_limit)
+                     List<PImage> imgs, int rate, int resource_limit)
     {
         super(name, position, animation_rate, imgs, rate, resource_limit);
     }

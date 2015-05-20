@@ -23,10 +23,8 @@ public class Main
 
     private static boolean RUN_AFTER_LOAD = true;
 
-    private final static String PATH = System.getProperty("user.dir");
-
-    private final static String IMAGE_LIST_FILE_NAME = "C:\\Users\\Chanye\\IdeaProjects\\CPE102 PROJECT\\src\\" + "imagelist";
-    private final static String WORLD_FILE = "C:\\Users\\Chanye\\IdeaProjects\\CPE102 PROJECT\\src\\" + "gaia.sav";
+    private final static String IMAGE_LIST_FILE_NAME = "imagelist";
+    private final static String WORLD_FILE = "gaia.sav";
 
     private static final int WORLD_WIDTH_SCALE = 2;
     private static final int WORLD_HEIGHT_SCALE = 2;
@@ -46,6 +44,9 @@ public class Main
     {
         HashMap<String, List<PImage>> i_store = new Image_store().load_images(IMAGE_LIST_FILE_NAME, TILE_WIDTH, TILE_HEIGHT);
         size(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        System.out.println(i_store.get("rocks"));
+        System.out.println(i_store.get("grass"));
 
         int num_cols = SCREEN_WIDTH / TILE_WIDTH * WORLD_WIDTH_SCALE;
         int num_rows = SCREEN_HEIGHT / TILE_HEIGHT * WORLD_HEIGHT_SCALE;
@@ -123,14 +124,17 @@ public class Main
         switch(keyCode)
         {
             case UP:
-                dy--;
+                dy += -1;
                 break;
+
             case DOWN:
                 dy++;
                 break;
+
             case LEFT:
-                dx--;
+                dx += -1;
                 break;
+
             case RIGHT:
                 dx++;
                 break;

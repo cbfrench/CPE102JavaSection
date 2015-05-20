@@ -12,7 +12,7 @@ public class Not_animated
     private int rate;
     private List<PImage> imgs;
 
-    public Not_animated(String name, ArrayList<PImage> imgs, Point position, int rate)
+    public Not_animated(String name, List<PImage> imgs, Point position, int rate)
     {
         super(name, position, imgs);
         this.rate = rate;

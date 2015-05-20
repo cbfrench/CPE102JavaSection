@@ -9,7 +9,7 @@ import java.util.List;
 public class Obstacle
     extends Position
 {
-    public Obstacle(String name, Point position, ArrayList<PImage> imgs)
+    public Obstacle(String name, Point position, List<PImage> imgs)
     {
         super(name, position, imgs);
     }

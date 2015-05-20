@@ -16,7 +16,7 @@ public class Position
     protected List<PImage> imgs;
     protected int current_img;
 
-    public Position(String name, Point position, ArrayList<PImage> imgs)
+    public Position(String name, Point position, List<PImage> imgs)
     {
         super(name);
         this.position = position;

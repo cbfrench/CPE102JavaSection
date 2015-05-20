@@ -134,10 +134,7 @@ public class WorldModel
         {
             return background[pt.getY()][pt.getX()];
         }
-        else
-        {
-            return null;
-        }
+        throw new IndexOutOfBoundsException("Point is not within the bounds of the grid.");
     }
 
     public void set_background(Point pt, Background bgnd)
@@ -174,10 +171,7 @@ public class WorldModel
         {
             return background.get_image();
         }
-        else
-        {
-            return null;
-        }
+        throw new NullPointerException("Herp derp.");
     }
     /*
     public Quake create_quake(Point pt, int ticks, HashMap<String, List<PImage>> i_store)

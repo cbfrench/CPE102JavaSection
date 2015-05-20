@@ -11,7 +11,7 @@ public class Vein
 {
     private int resource_distance;
 
-    public Vein(String name, ArrayList<PImage> imgs, Point position, int rate)
+    public Vein(String name, List<PImage> imgs, Point position, int rate)
     {
         super(name, imgs, position, rate);
         this.resource_distance = 1;

@@ -14,7 +14,7 @@ public class Blacksmith
     private int resource_distance;
     private ArrayList<Integer> imgs;
 
-    public Blacksmith(String name, Point position, ArrayList<PImage> imgs, int resource_limit, int rate, int resource_distance)
+    public Blacksmith(String name, Point position, List<PImage> imgs, int resource_limit, int rate, int resource_distance)
     {
         super(name, position, imgs);
         this.resource_distance = 1;

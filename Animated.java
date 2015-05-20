@@ -14,7 +14,7 @@ public class Animated
 {
     private int animation_rate;
 
-    public Animated(String name, Point position, int animation_rate, ArrayList<PImage> imgs)
+    public Animated(String name, Point position, int animation_rate, List<PImage> imgs)
     {
         super (name, position, imgs);
         this.animation_rate = animation_rate;

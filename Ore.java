@@ -12,7 +12,7 @@ public class Ore
 {
     private int rate;
 
-    public Ore(String name, ArrayList<PImage> imgs, Point position, int rate)
+    public Ore(String name, List<PImage> imgs, Point position, int rate)
     {
         super(name, imgs, position, rate);
         this.rate = 5000;

@@ -10,7 +10,7 @@ public class Background
     extends Position
 {
     Point pt;
-    public Background(String name, ArrayList<PImage> imgs)
+    public Background(String name, List<PImage> imgs)
     {
         super(name, null, imgs);
         this.imgs = imgs;

@@ -9,10 +9,9 @@ import java.util.ArrayList;
  * Created by Chanye on 5/18/2015.
  */
 public class WorldView
-    extends PApplet
 {
     public static int MOUSE_HOVER_ALPHA = 120;
-    public int MOUSE_HOVER_EMPTY_COLOR = color(0, 255, 0);
+    public int MOUSE_HOVER_EMPTY_COLOR;
 
     private Rectangle viewport;
     private WorldModel world;
@@ -25,6 +24,7 @@ public class WorldView
     public WorldView(PApplet master, int view_cols, int view_rows, WorldModel world, int tile_width, int tile_height)
     {
         this.master = master;
+        MOUSE_HOVER_EMPTY_COLOR = master.color(0, 255, 0);
         this.viewport = new Rectangle(0, 0, view_cols, view_rows);
         this.world = world;
         this.tile_width = tile_width;
@@ -112,7 +112,7 @@ public class WorldView
 
     public static int clamp(int v, int low, int high)
     {
-        return min(high, max(v, low));
+        return Math.min(high, Math.max(v, low));
     }
 
     public Point viewport_to_world(Rectangle viewport, Point pt)
@@ -127,9 +127,9 @@ public class WorldView
 
     public Rectangle create_shifted_viewport(Rectangle viewport, int[] delta, int num_rows, int num_cols)
     {
-        int new_x = clamp(viewport.getLeft() + delta[0], 0, this.getWidth());
-        int new_y = clamp(viewport.getTop() + delta[1], 0, this.getHeight());
-        return new Rectangle(new_x, new_y, this.width, this.height);
+        int new_x = clamp(viewport.getLeft() + delta[0], 0, num_cols - viewport.getWidth());
+        int new_y = clamp(viewport.getTop() + delta[1], 0, num_rows - viewport.getHeight());
+        return new Rectangle(new_x, new_y, viewport.getWidth(), viewport.getHeight());
     }
 
     public Rectangle getViewport()

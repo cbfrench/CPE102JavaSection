@@ -4,6 +4,7 @@ import processing.core.PImage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -15,44 +16,23 @@ public class Image_store
     public static final String DEFAULT_IMAGE_NAME = "background_default";
     protected static final int[] DEFAULT_IMAGE_COLOR = {128, 128, 128, 0};
     private static final int COLOR_MASK = 0xffffff;
-    protected static final List<PImage> newList = new ArrayList<PImage>();
     private Map<String, ArrayList<PImage>> images = new HashMap();
-
-    public int line_count(File file)
-    {
-        int count = 0;
-        Scanner in;
-        try
-        {
-            in = new Scanner(file);
-        }
-        catch(FileNotFoundException e)
-        {
-            System.out.println(e);
-            return -1;
-        }
-        while(in.hasNextLine())
-        {
-            count++;
-            in.nextLine();
-        }
-        return count;
-    }
 
     public HashMap<String, List<PImage>> load_images(String filename, int tile_width, int tile_height)
     {
         Scanner lines;
+        URL path = ClassLoader.getSystemResource(filename);
+
         try
         {
-            lines = new Scanner(new File(filename));
+            lines = new Scanner(new File(path.getFile()));
         }
         catch(FileNotFoundException e)
         {
             System.out.println(e);
             return null;
         }
-        int Count = line_count(new File(filename));
-        HashMap<String, List<PImage>> imgs = new HashMap<>(Count);
+        HashMap<String, List<PImage>> imgs = new HashMap<>();
         String line;
 
         while (lines.hasNextLine())
@@ -65,7 +45,7 @@ public class Image_store
 
     public void process_image_line(HashMap<String, List<PImage>> images, String line)
     {
-        String[] attrs = line.split("\\s");
+        String[] attrs = line.split(" ");
         if (attrs.length >= 2)
         {
             String key = attrs[0];
@@ -96,7 +76,7 @@ public class Image_store
         }
         else
         {
-            return newList;
+            return new ArrayList<PImage>();
         }
     }
 

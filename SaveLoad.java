@@ -2,6 +2,7 @@ import processing.core.PImage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
@@ -60,12 +61,13 @@ public class SaveLoad
 
     public static void load_world(WorldModel world, HashMap<String, List<PImage>> i_store, String file, boolean run)throws FileNotFoundException {
         Scanner lines;
-        lines = new Scanner(new File(file));
+        URL path = ClassLoader.getSystemResource(file);
+        lines = new Scanner(new File(path.getFile()));
         String[] properties;
 
         while (lines.hasNextLine())
         {
-            properties = lines.nextLine().split("\\s");
+            properties = lines.nextLine().split(" ");
             if (properties.length > 0)
             {
                 if (properties[PROPERTY_KEY].compareTo(BGDN_KEY) == 0)
@@ -80,13 +82,13 @@ public class SaveLoad
         }
     }
 
-    public static void add_background(WorldModel world, String[] properties, HashMap<String, List<PImage>> images)
+    public static void add_background(WorldModel world, String[] properties, HashMap<String, List<PImage>> i_store)
     {
         if (properties.length >= BGND_NUM_PROPERTIES)
         {
             Point pt = new Point(Integer.parseInt(properties[BGND_COL]), Integer.parseInt(properties[BGND_ROW]));
             String name = properties[BGND_NAME];
-            world.set_background(pt, new Background(name, new Image_store().get_images(name)));
+            world.set_background(pt, new Background(name, i_store.get(name)));
         }
     }
 
@@ -146,7 +148,7 @@ public class SaveLoad
             MinerNotFull miner = new MinerNotFull(properties[MINER_NAME],
                     new Point(Integer.parseInt(properties[MINER_COL]), Integer.parseInt(properties[MINER_ROW])),
                     Integer.parseInt(properties[MINER_ANIMATION_RATE]),
-                    new Image_store().get_images(properties[PROPERTY_KEY]),
+                    i_store.get(MINER_KEY),
                     Integer.parseInt(properties[MINER_RATE]),
                     Integer.parseInt(properties[MINER_LIMIT]));
             return miner;
@@ -162,7 +164,7 @@ public class SaveLoad
         if (properties.length == VEIN_NUM_PROPERTIES)
         {
             Vein vein = new Vein(properties[VEIN_NAME],
-                    new Image_store().get_images(properties[PROPERTY_KEY]),
+                    i_store.get(VEIN_KEY),
                     new Point(Integer.parseInt(properties[VEIN_COL]), Integer.parseInt(properties[VEIN_ROW])),
                     Integer.parseInt(properties[VEIN_RATE]));
             return vein;
@@ -178,7 +180,7 @@ public class SaveLoad
         if (properties.length == ORE_NUM_PROPERTIES)
         {
             Ore ore = new Ore(properties[ORE_NAME],
-                    new Image_store().get_images(properties[PROPERTY_KEY]),
+                    i_store.get(ORE_KEY),
                     new Point(Integer.parseInt(properties[ORE_COL]), Integer.parseInt(properties[ORE_ROW])),
                     Integer.parseInt(properties[ORE_RATE]));
             return ore;
@@ -195,7 +197,7 @@ public class SaveLoad
         {
             Blacksmith smith = new Blacksmith(properties[SMITH_NAME],
                     new Point(Integer.parseInt(properties[SMITH_COL]), Integer.parseInt(properties[SMITH_ROW])),
-                    new Image_store().get_images(properties[PROPERTY_KEY]),
+                    i_store.get(SMITH_KEY),
                     Integer.parseInt(properties[SMITH_LIMIT]),
                     Integer.parseInt(properties[SMITH_RATE]),
                     Integer.parseInt(properties[SMITH_REACH]));
@@ -213,7 +215,7 @@ public class SaveLoad
         {
             Obstacle obs = new Obstacle(properties[OBSTACLE_NAME],
                     new Point(Integer.parseInt(properties[OBSTACLE_COL]), Integer.parseInt(properties[OBSTACLE_ROW])),
-                    new Image_store().get_images(properties[PROPERTY_KEY]));
+                    i_store.get(OBSTACLE_KEY));
             return obs;
         }
         else
