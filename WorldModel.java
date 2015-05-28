@@ -1,232 +1,194 @@
-import javafx.geometry.Pos;
-import processing.core.PImage;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.LinkedList;
 
-import javax.swing.text.html.parser.Entity;
-import java.awt.font.NumericShaper;
-import java.lang.reflect.Array;
-import java.util.*;
-import java.util.function.Function;
-
-/**
- * Created by Chanye on 4/29/2015.
- */
 public class WorldModel
-    extends Image_store
 {
-    protected int num_rows;
-    protected int num_cols;
-    private Position[][] occupancy;
-    private Background[][] background;
-    private ArrayList<Position> entities;
-    private OrderedList action_queue;
-    private Random random;
+   private Background[][] background;
+   private WorldEntity[][] occupancy;
+   private List<WorldEntity> entities;
+   private int numRows;
+   private int numCols;
+   private OrderedList<Action> actionQueue;
 
-    public WorldModel(int num_rows, int num_cols, Background background) {
-        this.background = new Background[num_rows][num_cols];
-        this.num_rows = num_rows;
-        this.num_cols = num_cols;
-        this.occupancy = new Position[num_rows][num_cols];
-        this.entities = new ArrayList<>();
-        this.action_queue = new OrderedList();
-    }
+   public WorldModel(int numRows, int numCols, Background background)
+   {
+      this.background = new Background[numRows][numCols];
+      this.occupancy = new WorldEntity[numRows][numCols];
+      this.numRows = numRows;
+      this.numCols = numCols;
+      this.entities = new LinkedList<>();
+      this.actionQueue = new OrderedList<>();
 
-    public int getNumRows()
-    {
-        return this.num_rows;
-    }
+      for (int row = 0; row < numRows; row++)
+      {
+         Arrays.fill(this.background[row], background);
+      }
+   }
 
-    public int getNumCols()
-    {
-        return this.num_cols;
-    }
+   public boolean withinBounds(Point pt)
+   {
+      return pt.x >= 0 && pt.x < numCols && pt.y >= 0 && pt.y < numRows;
+   }
 
-    public boolean within_bounds(Point pt) {
-        return (pt.x >= 0 && pt.x < num_cols && pt.y >= 0 && pt.y < num_rows);
-    }
+   public int getNumRows()
+   {
+      return numRows;
+   }
 
-    public Position[][] get_occupancy()
-    {
-        return this.occupancy;
-    }
+   public int getNumCols()
+   {
+      return numCols;
+   }
 
-    public Position get_tile_occupant(Point pt)
-    {
-        if (within_bounds(pt))
-        {
-            return occupancy[pt.getY()][pt.getX()];
-        }
-        return null;
-    }
+   public List<WorldEntity> getEntities()
+   {
+      return entities;
+   }
 
-    public void set_tile_occupant(Point pt, Position entity)
-    {
-        if (within_bounds(pt))
-        {
-            occupancy[pt.getY()][pt.getX()] = entity;
-        }
-    }
+   public boolean isOccupied(Point pt)
+   {
+      return withinBounds(pt) && getCell(occupancy, pt) != null;
+   }
 
-    public boolean is_occupied(Point pt)
-    {
-        return (within_bounds(pt) && get_tile_occupant(pt) != null);
-    }
+   public WorldEntity findNearest(Point pt, Class type)
+   {
+      List<WorldEntity> ofType = new LinkedList<>();
+      for (WorldEntity entity : entities)
+      {
+         if (type.isInstance(entity))
+         {
+            ofType.add(entity);
+         }
+      }
 
-    public int distance_sq(Point p1, Point p2) {
-        return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
-    }
+      return nearestEntity(ofType, pt);
+   }
 
-    public void schedule_action(Object action, long time)
-    {
-        action_queue.insert(action, time);
-    }
+   public void addEntity(WorldEntity entity)
+   {
+      Point pt = entity.getPosition();
+      if (withinBounds(pt))
+      {
+         WorldEntity old = getCell(occupancy, pt);
+         if (old != null)
+         {
+            old.remove(this);
+         }
+         setCell(occupancy, pt, entity);
+         entities.add(entity);
+      }
+   }
 
-    public Position nearest_entity(ArrayList<Position> entity_dists, ArrayList<Integer> dist) {
-        if (entity_dists.size() > 0) {
-            int pair = dist.get(0);
-            int idx = 0;
-            for (int i = 0; i < entity_dists.size(); i++) {
-                if (dist.get(i) < pair) {
-                    pair = dist.get(i);
-                    idx = i;
-                }
-            }
-            return entity_dists.get(idx);
-        } else {
-            return null;
-        }
-    }
+   public ArrayList<Point> moveEntity(WorldEntity entity, Point pt)
+   {
+      ArrayList<Point> path = new ArrayList<Point>();
+      if (withinBounds(pt))
+      {
+         Point oldPt = entity.getPosition();
+         setCell(occupancy, oldPt, null);
+         path.add(oldPt);
+         removeEntityAt(pt);
+         setCell(occupancy, pt, entity);
+         path.add(pt);
+         entity.setPosition(pt);
+      }
+      return path;
+   }
 
-    public Name find_nearest(Point pt, Position type) {
-        ArrayList<Position> oftype = new ArrayList<Position>();
-        ArrayList<Integer> distance = new ArrayList<Integer>();
-        Position nearest = entities.get(0);
-        for (Position ent : entities) {
-            if (type instanceof Position) {
-                oftype.add(ent);
-                distance.add(distance_sq(pt, ent.get_position()));
-            }
-        }
-        return nearest_entity(oftype, distance);
-    }
+   public void removeEntity(WorldEntity entity)
+   {
+      removeEntityAt(entity.getPosition());
+   }
 
-    public void add_entity(Position entity)
-    {
-        entities.add(entity);
-    }
+   public void removeEntityAt(Point pt)
+   {
+      if (withinBounds(pt) && getCell(occupancy, pt) != null)
+      {
+         WorldEntity entity = getCell(occupancy, pt);
+         entity.setPosition(new Point(-1, -1));
+         entities.remove(entity);
+         setCell(occupancy, pt, null);
+      }
+   }
 
-    public void remove_entity(Position entity) {
-        remove_entity_at(entity.get_position());
-    }
+   public Background getBackground(Point pt)
+   {
+      return withinBounds(pt) ? getCell(background, pt) : null;
+   }
 
-    public void remove_entity_at(Point pt) {
-        if(is_occupied(pt))
-        {
-            Position entity = get_tile_occupant(pt);
-            entity.set_position(new Point(-1, -1));
-            get_entities().remove(entity);
-            set_tile_occupant(pt, null);
-        }
-    }
+   public void setBackground(Point pt, Background bgnd)
+   {
+      if (withinBounds(pt))
+      {
+         setCell(background, pt, bgnd);
+      }
+   }
 
-    public Background get_background(Point pt)
-    {
-        if (within_bounds(pt))
-        {
-            return background[pt.getY()][pt.getX()];
-        }
-        throw new IndexOutOfBoundsException("Point is not within the bounds of the grid.");
-    }
+   public WorldEntity getTileOccupant(Point pt)
+   {
+      return withinBounds(pt) ? getCell(occupancy, pt) : null;
+   }
 
-    public void set_background(Point pt, Background bgnd)
-    {
-        if (within_bounds(pt))
-        {
-            background[pt.getY()][pt.getX()] = bgnd;
-        }
-    }
+   public void scheduleAction(Action action, long time)
+   {
+      actionQueue.insert(action, time);
+   }
 
-    public ArrayList<Position> get_entities()
-    {
-        return entities;
-    }
+   public void unscheduleAction(Action action)
+   {
+      actionQueue.remove(action);
+   }
 
-    public void unschedule_action(Object action)
-    {
-        action_queue.remove(action);
-    }
-    /*
-    public ArrayList<Integer> update_on_time(int ticks)
-    {
-        ArrayList<Integer> tiles = new ArrayList<Integer>();
+   public void updateOnTime(long time)
+   {
+      OrderedList.ListItem<Action> next = actionQueue.head();
+      while (next != null && next.ord < time)
+      {
+         actionQueue.pop();
+         next.item.execute(time);
+         next = actionQueue.head();
+      }
+   }
 
-        ArrayList<ListItem> next = action_queue.head();
-        while (next && next.ord < 1)
-    }
-    */
+   private static WorldEntity nearestEntity(List<WorldEntity> entities,
+      Point pt)
+   {
+      if (entities.size() == 0)
+      {
+         return null;
+      }
+      WorldEntity nearest = entities.get(0);
+      double nearest_dist = distance_sq(nearest.getPosition(), pt);
 
-    public PImage get_background_image(Point pt)
-    {
-        Position background = get_background(pt);
-        if (background != null)
-        {
-            return background.get_image();
-        }
-        throw new NullPointerException("Herp derp.");
-    }
-    /*
-    public Quake create_quake(Point pt, int ticks, HashMap<String, List<PImage>> i_store)
-    {
-        Quake quake = new Quake("quake", pt, Actions.QUAKE_ANIMATION_RATE, new Image_store().get_images("quake"));
-        quake.schedule_quake(this, ticks);
-        return quake;
-    }
+      for (WorldEntity entity : entities)
+      {
+         double dist = distance_sq(entity.getPosition(), pt);
+         if (dist < nearest_dist)
+         {
+            nearest = entity;
+            nearest_dist = dist;
+         }
+      }
 
-    public OreBlob create_blob(String name, Point pt, int rate, int ticks, HashMap<String, List<PImage>> i_store)
-    {
-        OreBlob blob = new OreBlob(name, pt, (random.nextInt(Actions.BLOB_ANIMATION_MAX - Actions.BLOB_ANIMATION_MIN + 1) + Actions.BLOB_ANIMATION_MIN)
-                                              * Actions.BLOB_ANIMATION_RATE_SCALE, Image_store.get_images(i_store, "blob"), rate);
-        blob.schedule_blob(this, ticks, i_store);
-        return blob;
-    }
-    */
+      return nearest;
+   }
 
-    public Vein create_vein(String name, Point pt, int ticks, HashMap<String, List<PImage>> i_store)
-    {
-        Vein vein = new Vein("vein" + name, new Image_store().get_images("vein"), pt, (random.nextInt(Actions.VEIN_RATE_MAX - Actions.VEIN_RATE_MIN + 1)
-                + Actions.VEIN_RATE_MIN));
-        return vein;
-    }
-    /*
-    public Ore create_ore(String name, Point pt, int ticks, HashMap<String, List<PImage>> i_store)
-    {
-        Ore ore = new Ore(name, Image_store.get_images(i_store, "blob"), pt, (random.nextInt(Actions.ORE_CORRUPT_MAX - Actions.ORE_CORRUPT_MIN + 1)));
-        ore.schedule_ore(this, ticks, i_store);
-        return ore;
-    }
-    */
-    public Point find_open_around(Point pt, int distance)
-    {
-        for (int dy = -distance ; dy <= distance + 1; dy ++)
-        {
-            for (int dx = -distance ; dx <= distance +1; dx ++ )
-            {
-                Point new_pt = new Point(pt.getX() + dx, pt.getY() + dy);
+   private static double distance_sq(Point p1, Point p2)
+   {
+      double dx = p1.x - p2.x;
+      double dy = p1.y - p2.y;
+      return dx * dx + dy * dy;
+   }
 
-                if (within_bounds(new_pt) && !(is_occupied(pt)))
-                {
-                    return new_pt;
-                }
-            }
-        }
-        return null;
-    }
+   private static <T> T getCell(T[][] grid, Point pt)
+   {
+      return grid[pt.y][pt.x];
+   }
 
-    public void clear_pending_actions_world(Position entity)
-    {
-        for (Object action : entity.get_pending_actions())
-        {
-            unschedule_action(action);
-        }
-        entity.clear_pending_actions();
-    }
+   private static <T> void setCell(T[][] grid, Point pt, T v)
+   {
+      grid[pt.y][pt.x] = v;
+   }
 }

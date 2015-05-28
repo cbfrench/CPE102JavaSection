@@ -1,19 +1,39 @@
 import processing.core.PImage;
-
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by Chanye on 4/28/2015.
- */
 public class MinerFull
-    extends Miner
+   extends Miner
 {
-    public MinerFull(String name, Point position, int animation_rate,
-                     List<PImage> imgs, int rate, int resource_limit)
-    {
-        super(name, position, animation_rate, imgs, rate, resource_limit);
-    }
+   public MinerFull(String name, Point position, int rate,
+      int animation_rate, int resource_limit, List<PImage> imgs,
+                    WorldModel world)
+   {
+      super(name, position, rate, animation_rate, resource_limit,
+         resource_limit, Blacksmith.class, imgs);
+   }
+
+   protected Miner transform(WorldModel world)
+   {
+      return new MinerNotFull(getName(), getPosition(), getRate(),
+         getAnimationRate(), getResourceLimit(), getImages());
+   }
+
+   protected boolean move(WorldModel world, WorldEntity smith)
+   {
+      if (smith == null)
+      {
+         return false;
+      }
+
+      if (adjacent(getPosition(), smith.getPosition()))
+      {
+         setResourceCount(0);
+         return true;
+      }
+      else
+      {
+         world.moveEntity(this, nextPosition(world, this.getPosition(), smith.getPosition()));
+         return false;
+      }
+   }
 }

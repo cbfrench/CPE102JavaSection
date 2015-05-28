@@ -1,31 +1,56 @@
 import processing.core.PImage;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
-/**
- * Created by Chanye on 4/28/2015.
- */
 public class Ore
-    extends Not_animated
+   extends Actor
 {
-    private int rate;
+   private static final int DEFAULT_RATE = 5000;
+   private static final int BLOB_RATE_SCALE = 4;
+   private static final int BLOB_ANIMATION_RATE_SCALE = 50;
+   private static final int BLOB_ANIMATION_MIN = 1;
+   private static final int BLOB_ANIMATION_MAX = 3;
 
-    public Ore(String name, List<PImage> imgs, Point position, int rate)
-    {
-        super(name, imgs, position, rate);
-        this.rate = 5000;
-    }
+   private static final Random rand = new Random();
 
-    public String entity_string()
-    {
-        return "Ore " + get_name() + " " + get_position().x + " " + get_position().y + " " + rate;
-    }
-    /*
-    public void schedule_ore(WorldModel world, int ticks, HashMap<String, List<PImage>> i_store)
-    {
-        schedule_action(world, create_ore_transform_action(world, i_store), ticks + get_rate());
-    }
-    */
+   public Ore(String name, Point position, int rate, List<PImage> imgs)
+   {
+      super(name, position, rate, imgs);
+   }
+
+   public Ore(String name, Point position, List<PImage> imgs)
+   {
+      this(name, position, DEFAULT_RATE, imgs);
+   }
+
+   public String toString()
+   {
+      return String.format("ore %s %d %d %d", this.getName(),
+         this.getPosition().x, this.getPosition().y, this.getRate());
+   }
+
+   public Action createAction(WorldModel world, ImageStore imageStore)
+   {
+      Action[] action = { null };
+      action[0] = ticks -> {
+         removePendingAction(action[0]);
+         OreBlob blob = createBlob(world, getName() + " -- blob",
+            getPosition(), getRate() / BLOB_RATE_SCALE, ticks, imageStore);
+
+         remove(world);
+         world.addEntity(blob);
+      };
+      return action[0];
+   }
+
+   private static OreBlob createBlob(WorldModel world, String name,
+      Point pt, int rate, long ticks, ImageStore imageStore)
+   {
+      OreBlob blob = new OreBlob(name, pt, rate,
+         BLOB_ANIMATION_RATE_SCALE * (BLOB_ANIMATION_MIN +
+            rand.nextInt(BLOB_ANIMATION_MAX - BLOB_ANIMATION_MIN)),
+         imageStore.get("blob"), world);
+      blob.schedule(world, ticks, imageStore);
+      return blob;
+   }
 }

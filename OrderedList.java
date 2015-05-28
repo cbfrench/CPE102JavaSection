@@ -1,67 +1,82 @@
-import java.util.ArrayList;
+import java.util.List;
+import java.util.LinkedList;
 
-/**
- * Created by Chanye on 5/3/2015.
- */
-public class
-        OrderedList
+public class OrderedList<T>
 {
-    private ArrayList<ListItem> list;
+   private List<ListItem<T>> list;
 
-    public OrderedList()
-    {
-        this.list = new ArrayList<ListItem>();
-    }
+   public OrderedList()
+   {
+      list = new LinkedList<>();
+   }
 
-    public void insert(Object item, long ord)
-    {
-        int size = list.size();
-        int idx = 0;
-        while (idx < size && list.get(idx).ord < ord)
-        {
-            idx++;
-        }
-        list.set(idx, new ListItem(item, ord));
-    }
+   public void insert(T item, long ord)
+   {
+      int idx = 0;
+      for (ListItem<T> lItem : list)
+      {
+         if (lItem.ord >= ord)
+         {
+            break;
+         }
+         idx++;
+      }
 
-    public void remove(Object item)
-    {
-        int size = list.size();
-        int idx = 0;
-        while (idx < size && list.get(idx).item != item)
-        {
-            idx++;
-        }
+      list.add(idx, new ListItem<>(item, ord));
+   }
 
-        if (idx < size)
-        {
-            list.remove(idx + 1);
-        }
-    }
+   public void remove(T item)
+   {
+      int idx = 0;
+      for (ListItem<T> lItem : list)
+      {
+         if (lItem.item.equals(item))
+         {
+            break;
+         }
+         idx++;
+      }
 
-    public ListItem head()
-    {
-        if (list != new ArrayList<ListItem>())
-        {
-            return list.get(0);
-        }
-        else
-        {
-            return null;
-        }
-    }
+      if (idx < list.size())
+      {
+         list.remove(idx);
+      }
+   }
 
-    public ListItem pop()
-    {
-        if (list != new ArrayList<ListItem>())
-        {
-            ListItem x = list.get(0);
-            list.remove(0);
-            return x;
-        }
-        else
-        {
-            return null;
-        }
-    }
+   public ListItem<T> head()
+   {
+      if (!list.isEmpty())
+      {
+         return list.get(0);
+      }
+      else
+      {
+         return null;
+      }
+   }
+
+   public void pop()
+   {
+      if (!list.isEmpty())
+      {
+         list.remove(0);
+      }
+   }
+
+   public int size()
+   {
+      return list.size();
+   }
+
+   public static class ListItem<T>
+   {
+      public final T item;
+      public final long ord;
+
+      public ListItem(T item, long ord)
+      {
+         this.item = item;
+         this.ord = ord;
+      }
+   }
 }

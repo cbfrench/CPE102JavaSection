@@ -1,21 +1,17 @@
 import processing.core.PImage;
-
-import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Chanye on 4/28/2015.
- */
 public class Obstacle
-    extends Position
+   extends WorldEntity
 {
-    public Obstacle(String name, Point position, List<PImage> imgs)
-    {
-        super(name, position, imgs);
-    }
+   public Obstacle(String name, Point position, List<PImage> imgs)
+   {
+      super(name, position, imgs);
+   }
 
-    public String entity_string()
-    {
-        return "Obstacle " + get_name() + " " + get_position().x + " " + get_position().y;
-    }
+   public String toString()
+   {
+      return String.format("obstacle %s %d %d", this.getName(),
+         this.getPosition().x, this.getPosition().y);
+   }
 }
