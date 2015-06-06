@@ -1,0 +1,6 @@
+1) To plant a large tree in the ground, press the "T" key first to bring up the tree's image over your mouse's position. This tree will turn red if 
+   the pointer is over an obstacle, and if it's not, it can be placed with the click of the mouse.
+2) This newly planted tree becomes an obstacle in the world, meaning the miners cannot pass through it. In addition to that, the tree acts as a spawn
+   point for our newly created fairies.
+3) This new class of fairies only affects the OreBlob entities.
+4) The fairies hunt down OreBlobs and once they catch up with them, they turn the blobs into crystals, which then turn into veins after a short time.

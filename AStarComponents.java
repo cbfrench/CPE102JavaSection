@@ -23,7 +23,7 @@ public class AStarComponents
         return came_from;
     }
 
-    public void getCameFrom(AStarComponents newFrom)
+    public void setCameFrom(AStarComponents newFrom)
     {
         came_from = newFrom;
     }
@@ -46,10 +46,5 @@ public class AStarComponents
     public void setF_score(double newF_score)
     {
         f_score = newF_score;
-    }
-
-    public String toString()
-    {
-        return pt.toString();
     }
 }

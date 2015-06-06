@@ -17,7 +17,7 @@ public abstract class Actor
 
    public int getRate()
    {
-      return this.rate;
+      return rate;
    }
 
    protected void removePendingAction(Action action)

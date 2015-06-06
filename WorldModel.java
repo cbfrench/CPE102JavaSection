@@ -1,3 +1,5 @@
+import processing.core.PImage;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,6 +54,22 @@ public class WorldModel
       return withinBounds(pt) && getCell(occupancy, pt) != null;
    }
 
+   public boolean isAreaOccupied(Point pt)
+   {
+      boolean result = false;
+
+      for(int dy = 0; dy < 4; dy++)
+      {
+         for(int dx = 0; dx < 4; dx++)
+         {
+            Point newPt = new Point(pt.x + dx, pt.y + dy);
+            result = !withinBounds(newPt) || result || getCell(occupancy, newPt) != null;
+         }
+      }
+
+      return result;
+   }
+
    public WorldEntity findNearest(Point pt, Class type)
    {
       List<WorldEntity> ofType = new LinkedList<>();
@@ -79,6 +97,19 @@ public class WorldModel
          setCell(occupancy, pt, entity);
          entities.add(entity);
       }
+   }
+
+   public void addTree(Tree tree)
+   {
+      Point pt = tree.getPosition();
+      for(int dy = 0; dy < 4; dy++)
+      {
+         for(int dx = 0; dx < 4; dx++)
+         {
+            setCell(occupancy,new Point(pt.x + dx, pt.y + dy),tree);
+         }
+      }
+      entities.add(tree);
    }
 
    public ArrayList<Point> moveEntity(WorldEntity entity, Point pt)

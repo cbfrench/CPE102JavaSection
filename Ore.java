@@ -18,11 +18,6 @@ public class Ore
       super(name, position, rate, imgs);
    }
 
-   public Ore(String name, Point position, List<PImage> imgs)
-   {
-      this(name, position, DEFAULT_RATE, imgs);
-   }
-
    public String toString()
    {
       return String.format("ore %s %d %d %d", this.getName(),

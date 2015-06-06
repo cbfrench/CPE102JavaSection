@@ -10,8 +10,8 @@ public class Main extends PApplet
    private static final int WORLD_WIDTH_SCALE = 2;
    private static final int WORLD_HEIGHT_SCALE = 2;
 
-   private static final int SCREEN_WIDTH = 640;
-   private static final int SCREEN_HEIGHT = 480;
+   private static final int SCREEN_WIDTH = 640 * 2;
+   private static final int SCREEN_HEIGHT = 480 * 2;
    private static final int TILE_WIDTH = 32;
    private static final int TILE_HEIGHT = 32;
 
@@ -27,6 +27,7 @@ public class Main extends PApplet
    private long next_time;
    private WorldModel world;
    private WorldView view;
+   private boolean placeMode;
 
 
    public void setup()
@@ -67,9 +68,28 @@ public class Main extends PApplet
          world.updateOnTime(time);
          next_time = time + TIMER_ACTION_DELAY;
       }
-
       view.drawViewport();
       drawPath();
+      if (placeMode)
+      {
+         drawMouse();
+      }
+   }
+
+   public void mouseClicked()
+   {
+      int x = mouseX / TILE_WIDTH;
+      int y = mouseY / TILE_HEIGHT;
+
+      Point wPt = view.viewportToWorld(WorldView.viewport, x - 2, y - 2);
+
+      if (!world.isAreaOccupied(wPt))
+      {
+         Tree tree = new Tree("tree", wPt, 55000, Tree.distance, imageStore.get("tree"));
+         long ticks = System.currentTimeMillis();
+         world.addTree(tree);
+         tree.schedule(world, ticks, imageStore);
+      }
    }
 
    public void keyPressed()
@@ -94,6 +114,15 @@ public class Main extends PApplet
                break;
          }
          view.updateView(dx, dy);
+      }
+      else
+      {
+         switch (key)
+         {
+            case 't':
+               placeMode = !placeMode;
+               break;
+         }
       }
    }
 
@@ -189,6 +218,14 @@ public class Main extends PApplet
    private static final int VEIN_ROW = 3;
    private static final int VEIN_REACH = 5;
 
+   private static final String TREE_KEY = "tree";
+   private static final int TREE_NUM_PROPERTIES = 6;
+   private static final int TREE_NAME = 1;
+   private static final int TREE_RATE = 4;
+   private static final int TREE_COL = 2;
+   private static final int TREE_ROW = 3;
+   private static final int TREE_REACH = 5;
+
    private static Map<String, PropertyParser> buildPropertyParsers(
       WorldModel world, ImageStore imageStore, long time)
    {
@@ -220,6 +257,21 @@ public class Main extends PApplet
                entity.schedule(world, time + entity.getRate(), imageStore);
             }
          });
+
+      parsers.put(TREE_KEY, properties -> {
+         if (properties.length == TREE_NUM_PROPERTIES)
+         {
+            Point pt = new Point(Integer.parseInt(properties[TREE_COL]),
+                    Integer.parseInt(properties[TREE_ROW]));
+            Actor entity = new Tree(properties[TREE_NAME],
+                    pt,
+                    Integer.parseInt(properties[TREE_RATE]),
+                    Integer.parseInt(properties[TREE_REACH]),
+                    imageStore.get(TREE_KEY));
+            world.addEntity(entity);
+            entity.schedule(world, time + entity.getRate(), imageStore);
+         }
+      });
 
       parsers.put(OBSTACLE_KEY, properties -> {
             if (properties.length == OBSTACLE_NUM_PROPERTIES)
@@ -303,6 +355,33 @@ public class Main extends PApplet
          {
 
          }
+      }
+   }
+
+   public void drawMouse()
+   {
+      int x = mouseX / TILE_WIDTH;
+      int y = mouseY / TILE_HEIGHT;
+
+      Point wPt = view.viewportToWorld(WorldView.viewport, x - 2, y - 2);
+
+      if(!world.isAreaOccupied(wPt))
+      {
+         tint(255, 125);
+         image(
+                 loadImage("LemonTree.png"),
+                 (x * TILE_WIDTH) - (TILE_WIDTH * 2) ,
+                 (y * TILE_HEIGHT) - (TILE_HEIGHT * 2));
+         noTint();
+      }
+      else
+      {
+         tint(255, 0, 0, 125);
+         image(
+                 loadImage("LemonTree.png"),
+                 (x * TILE_WIDTH) - (TILE_WIDTH * 2) ,
+                 (y * TILE_HEIGHT) - (TILE_HEIGHT * 2));
+         noTint();
       }
    }
 

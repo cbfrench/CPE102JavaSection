@@ -1,4 +1,5 @@
 blacksmith images/blacksmith.bmp
+tree images/tree.png
 blob images/blob1.bmp 255 255 255 0
 blob images/blob2.bmp 255 255 255 0
 blob images/blob3.bmp 255 255 255 0
@@ -11,6 +12,10 @@ blob images/blob9.bmp 255 255 255 0
 blob images/blob10.bmp 255 255 255 0
 blob images/blob11.bmp 255 255 255 0
 blob images/blob12.bmp 255 255 255 0
+Fairy images/fairy1.gif 255 255 255 0
+Fairy images/fairy2.gif 255 255 255 0
+Fairy images/fairy3.gif 255 255 255 0
+Fairy images/fairy4.gif 255 255 255 0
 grass images/grass.bmp
 miner images/miner1.bmp 252 252 252 0
 miner images/miner2.bmp 252 252 252 0
@@ -27,4 +32,5 @@ quake images/quake5.bmp 255 255 255 0
 quake images/quake6.bmp 255 255 255 0
 rocks images/rock.bmp
 vein images/vein.bmp
+crystal images/freeze1.png
 background_default images/none.bmp

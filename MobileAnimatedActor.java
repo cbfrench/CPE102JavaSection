@@ -23,10 +23,6 @@ public abstract class MobileAnimatedActor
       return path;
    }
 
-   public void setPath(ArrayList<Point> path) {
-      this.path = path;
-   }
-
    public void AStar(Point start, Point goal, WorldModel world)
    {
       List<AStarComponents> open_set = new ArrayList<AStarComponents>();
@@ -71,7 +67,7 @@ public abstract class MobileAnimatedActor
 
             if(!open_set.contains(neighbor) || tentative_g_score < neighbor.getG_score())
             {
-               neighbor.getCameFrom(current);
+               neighbor.setCameFrom(current);
                neighbor.setG_score(tentative_g_score);
                neighbor.setF_score(neighbor.getG_score() + neighbor.getPt().toDestination(goal.x, goal.y));
                if (!open_set.contains(neighbor))
@@ -114,12 +110,15 @@ public abstract class MobileAnimatedActor
    {
       ArrayList<AStarComponents> neighbors = new ArrayList<>();
       Point currentPt = current.getPt();
+
       int currentX = currentPt.x;
       int currentY = currentPt.y;
+
       Point up = new Point(currentX, currentY - 1);
       Point right = new Point(currentX + 1, currentY);
       Point down = new Point(currentX, currentY + 1);
       Point left = new Point(currentX - 1, currentY);
+
       if (world.withinBounds(up) && (world.getTileOccupant(up) == null) || up.equals(goal))
       {
          neighbors.add(node[up.y][up.x]);
@@ -153,7 +152,6 @@ public abstract class MobileAnimatedActor
       {
          newPoint = getPath().get(getPath().size() - 2);
       }
-
       return newPoint;
    }
 

@@ -6,7 +6,7 @@ public class Vein
    extends Actor
 {
    private static final int DEFAULT_DISTANCE = 1;
-   private int resourceDistance;
+   private static int resourceDistance;
 
    private static final int ORE_CORRUPT_MIN = 20000;
    private static final int ORE_CORRUPT_MAX = 30000;
@@ -18,11 +18,6 @@ public class Vein
    {
       super(name, position, rate, imgs);
       this.resourceDistance = resourceDistance;
-   }
-
-   public Vein(String name, Point position, int rate, List<PImage> imgs)
-   {
-      this(name, position, rate, DEFAULT_DISTANCE, imgs);
    }
 
    public String toString()
@@ -77,5 +72,10 @@ public class Vein
       }
 
       return null;
+   }
+
+   public static int getResourceDistance()
+   {
+      return resourceDistance;
    }
 }
